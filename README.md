@@ -64,24 +64,119 @@ A complete restaurant management system for a restaurant in Kiambu Thindigua, fo
 ### Prerequisites
 - Docker and Docker Compose
 - Git
+- Node.js (v16 or higher) for frontend development
+- Python 3.11 or higher for backend development
+- PostgreSQL (if not using Docker)
 
-### Installation
+### Installation with Docker (Recommended)
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Kipngetich98/Restaurant-Management-System-.git
+git clone https://github.com/Kipngetich98/Restaurant-Management-System.git
 cd Restaurant-Management-System
 ```
 
-2. Start the application using Docker Compose:
+2. Configure environment variables:
 ```bash
-docker-compose up -d
+# Copy the example environment files
+cp backend/restaurant_backend/.env.example backend/restaurant_backend/.env
+cp frontend/restaurant_frontend/.env.example frontend/restaurant_frontend/.env
+
+# Edit the environment files if needed
+# For production, update the DATABASE_URL and SECRET_KEY in backend/.env
+# For production, update the VITE_API_URL in frontend/.env
 ```
 
-3. Access the application:
+3. Build and start the application using Docker Compose:
+```bash
+docker-compose up -d --build
+```
+
+4. Initialize the database with seed data:
+```bash
+docker-compose exec backend poetry run python -m app.scripts.seed_data
+```
+
+5. Access the application:
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
+
+### Manual Installation (Development)
+
+#### Backend Setup
+
+1. Navigate to the backend directory:
+```bash
+cd backend/restaurant_backend
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install Poetry and dependencies:
+```bash
+pip install poetry
+poetry install
+```
+
+4. Configure environment variables:
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit the .env file with your database credentials and other settings
+# For SQLite (development):
+# DATABASE_URL=sqlite:///./restaurant.db
+# For PostgreSQL:
+# DATABASE_URL=postgresql://postgres:postgres@localhost:5432/restaurant_db
+```
+
+5. Initialize the database:
+```bash
+poetry run python -m app.scripts.create_tables
+poetry run python -m app.scripts.seed_data
+```
+
+6. Run the development server:
+```bash
+poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+#### Frontend Setup
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend/restaurant_frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Configure environment variables:
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit the .env file
+# For local development:
+# VITE_API_URL=http://localhost:8000
+```
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+5. Build for production:
+```bash
+npm run build
+```
 
 ### Default Credentials
 
@@ -92,6 +187,23 @@ The system is seeded with the following default users:
 | admin    | admin123 | Admin |
 | manager  | manager123 | Manager |
 | staff    | staff123 | Staff |
+
+### Troubleshooting
+
+1. If you encounter database connection issues:
+   - Check that PostgreSQL is running
+   - Verify the DATABASE_URL in the .env file
+   - For Docker, ensure the db service is running: `docker-compose ps`
+
+2. If the frontend can't connect to the backend:
+   - Check that the backend is running
+   - Verify the VITE_API_URL in the frontend .env file
+   - Check for CORS issues in the browser console
+
+3. For Docker-related issues:
+   - Check Docker logs: `docker-compose logs -f`
+   - Rebuild containers: `docker-compose up -d --build`
+   - Reset containers: `docker-compose down -v && docker-compose up -d`
 
 ## Development Setup
 
